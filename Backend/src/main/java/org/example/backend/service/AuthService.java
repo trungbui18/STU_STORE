@@ -1,0 +1,97 @@
+package org.example.backend.service;
+
+import org.example.backend.config.jwt.JwtUtil;
+import org.example.backend.model.Account;
+import org.example.backend.model.DTO.LoginAdminRequest;
+import org.example.backend.model.DTO.LoginRequest;
+import org.example.backend.model.DTO.LoginResponse;
+import org.example.backend.model.DTO.RegisterDTO;
+import org.example.backend.model.Profile;
+import org.example.backend.model.Role;
+import org.example.backend.model.Staff;
+import org.example.backend.repository.AccountRepository;
+import org.example.backend.repository.CustomerRepository;
+import org.example.backend.repository.StaffRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+@Service
+public class AuthService {
+
+    private AuthenticationManager authenticationManager;
+    private AccountRepository accountRepository;
+    private JwtUtil jwtUtil;
+    private CustomerRepository customerRepository;
+    private PasswordEncoder passwordEncoder;
+
+    public AuthService(AuthenticationManager authenticationManager, AccountRepository accountRepository, JwtUtil jwtUtil, CustomerRepository customerRepository, PasswordEncoder passwordEncoder) {
+        this.authenticationManager = authenticationManager;
+        this.accountRepository = accountRepository;
+        this.jwtUtil = jwtUtil;
+        this.customerRepository = customerRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    public String login(LoginRequest loginRequest) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
+        );
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        Account account = accountRepository.findByEmail(loginRequest.getEmail())
+                .orElseThrow(() -> new RuntimeException("Account not found"));
+        String role = account.getRole().toString();
+        return jwtUtil.generateToken(loginRequest.getEmail(),role);
+    }
+
+    public void Register(RegisterDTO registerDTO) {
+        Account account = new Account();
+        account.setEmail(registerDTO.getEmail());
+        account.setPassword(passwordEncoder.encode(registerDTO.getPassword()));
+        account.setRole(Role.USER);
+        accountRepository.save(account);
+
+        Profile customer = new Profile();
+        customer.setName(registerDTO.getName());
+        customer.setAddress(registerDTO.getAddress());
+        customer.setNumberPhone(registerDTO.getNumberPhone());
+        customer.setBirthday(registerDTO.getBirthday());
+        customer.setAccount(account);
+        customerRepository.save(customer);
+    }
+
+
+    public String hashWithSHA256(String input) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hashedBytes = digest.digest(input.getBytes(StandardCharsets.UTF_8));
+
+            StringBuilder sb = new StringBuilder();
+            for (byte b : hashedBytes) {
+                sb.append(String.format("%02x", b));
+            }
+            return sb.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+}
