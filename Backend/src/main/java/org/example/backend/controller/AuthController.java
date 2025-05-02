@@ -1,10 +1,7 @@
 package org.example.backend.controller;
 
 import org.example.backend.config.jwt.JwtUtil;
-import org.example.backend.model.DTO.LoginAdminRequest;
-import org.example.backend.model.DTO.LoginRequest;
-import org.example.backend.model.DTO.LoginResponse;
-import org.example.backend.model.DTO.RegisterDTO;
+import org.example.backend.model.DTO.*;
 import org.example.backend.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,22 +29,22 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody LoginRequest loginRequest) {
-        String token=authService.login(loginRequest);
-        return token;
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+        try {
+            return ResponseEntity.ok(authService.login(loginRequest));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
-//    @PostMapping("/admin/login")
-//    public ResponseEntity<?> loginAdmin(@RequestBody LoginAdminRequest loginAdminRequest) {
-//        try {
-////            LoginResponse loginResponse = authService.loginAdmin(loginAdminRequest);
-//            return new ResponseEntity.ok();
-//        } catch (RuntimeException e) {
-//            Map<String, String> response = new HashMap<>();
-//            response.put("message", e.getMessage());
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-//        }
-//    }
+    @PostMapping("/refresh-token")
+    public ResponseEntity<TokenResponse> refreshToken(@RequestBody RefreshTokenRequest request) {
+        try {
+            return ResponseEntity.ok(authService.refreshAccessToken(request));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 
     @PostMapping("/register")
@@ -61,6 +58,5 @@ public class AuthController {
             throw new RuntimeException(e);
         }
     }
-
 
 }

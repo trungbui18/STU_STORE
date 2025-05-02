@@ -19,8 +19,11 @@ public class JwtUtil {
 
     private final SecretKey secretKey;
 
-    @Value("${jwt.expiration}")
-    private long expiration;
+    @Value("${jwt.accessTokenExpiration}")
+    private long accessTokenExpiration;
+
+    @Value("${jwt.refreshTokenExpiration}")
+    private long refreshTokenExpiration;
 
     @Value("${jwt.issuer}")
     private String issuer;
@@ -32,18 +35,36 @@ public class JwtUtil {
     public String generateToken(String username, String roles) {
         try {
             Instant now = Instant.now();
+            System.out.println("Current time: " + now);
             return Jwts.builder()
                     .issuer(issuer)
                     .subject(username)
                     .claim("role", roles)
                     .issuedAt(Date.from(now))
-                    .expiration(Date.from(now.plusSeconds(expiration)))
+                    .expiration(Date.from(now.plusSeconds(accessTokenExpiration)))
                     .signWith(secretKey)
                     .compact();
         } catch (Exception e) {
             throw new JwtException("Invalid JWT", e);
         }
     }
+
+    public String generateRefreshToken(String username,String roles) {
+        try {
+            Instant now = Instant.now();
+            return Jwts.builder()
+                    .issuer(issuer)
+                    .subject(username)
+                    .claim("role", roles)
+                    .issuedAt(Date.from(now))
+                    .expiration(Date.from(now.plusSeconds(refreshTokenExpiration)))
+                    .signWith(secretKey)
+                    .compact();
+        } catch (Exception e) {
+            throw new JwtException("Invalid JWT", e);
+        }
+    }
+
 
     public Map<String, Object> parseClaims(String token) {
         try {

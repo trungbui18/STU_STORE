@@ -2,10 +2,7 @@ package org.example.backend.service;
 
 import org.example.backend.config.jwt.JwtUtil;
 import org.example.backend.model.Account;
-import org.example.backend.model.DTO.LoginAdminRequest;
-import org.example.backend.model.DTO.LoginRequest;
-import org.example.backend.model.DTO.LoginResponse;
-import org.example.backend.model.DTO.RegisterDTO;
+import org.example.backend.model.DTO.*;
 import org.example.backend.model.Profile;
 import org.example.backend.model.Role;
 import org.example.backend.model.Staff;
@@ -14,6 +11,7 @@ import org.example.backend.repository.CustomerRepository;
 import org.example.backend.repository.StaffRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -24,11 +22,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -49,16 +49,28 @@ public class AuthService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public String login(LoginRequest loginRequest) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
-        );
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+    public LoginResponse login(LoginRequest loginRequest) {
         Account account = accountRepository.findByEmail(loginRequest.getEmail())
                 .orElseThrow(() -> new RuntimeException("Account not found"));
+        if (!passwordEncoder.matches(loginRequest.getPassword(), account.getPassword())) {
+            throw new RuntimeException("Invalid password");
+        }
         String role = account.getRole().toString();
-        return jwtUtil.generateToken(loginRequest.getEmail(),role);
+        String accessToken=jwtUtil.generateToken(loginRequest.getEmail(), role);
+        String refreshToken=jwtUtil.generateRefreshToken(loginRequest.getEmail(),role);
+        return new LoginResponse(accessToken, refreshToken);
+    }
+
+    public TokenResponse refreshAccessToken(RefreshTokenRequest refreshToken) {
+        try {
+            Map<String, Object> claims = jwtUtil.parseClaims(refreshToken.getRefreshToken());
+            String username = (String) claims.get("sub");
+            String role = (String) claims.get("role");
+            String newAccessToken = jwtUtil.generateToken(username, role);
+            return new TokenResponse(newAccessToken);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid or expired refresh token");
+        }
     }
 
     public void Register(RegisterDTO registerDTO) {
