@@ -5,32 +5,18 @@ import org.example.backend.model.Account;
 import org.example.backend.model.DTO.*;
 import org.example.backend.model.Profile;
 import org.example.backend.model.Role;
-import org.example.backend.model.Staff;
 import org.example.backend.repository.AccountRepository;
-import org.example.backend.repository.CustomerRepository;
-import org.example.backend.repository.StaffRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
+import org.example.backend.repository.ProfileRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 public class AuthService {
@@ -38,14 +24,14 @@ public class AuthService {
     private AuthenticationManager authenticationManager;
     private AccountRepository accountRepository;
     private JwtUtil jwtUtil;
-    private CustomerRepository customerRepository;
+    private ProfileRepository profileRepository;
     private PasswordEncoder passwordEncoder;
 
-    public AuthService(AuthenticationManager authenticationManager, AccountRepository accountRepository, JwtUtil jwtUtil, CustomerRepository customerRepository, PasswordEncoder passwordEncoder) {
+    public AuthService(AuthenticationManager authenticationManager, AccountRepository accountRepository, JwtUtil jwtUtil, ProfileRepository profileRepository, PasswordEncoder passwordEncoder) {
         this.authenticationManager = authenticationManager;
         this.accountRepository = accountRepository;
         this.jwtUtil = jwtUtil;
-        this.customerRepository = customerRepository;
+        this.profileRepository = profileRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -58,7 +44,8 @@ public class AuthService {
         String role = account.getRole().toString();
         String accessToken=jwtUtil.generateToken(loginRequest.getEmail(), role);
         String refreshToken=jwtUtil.generateRefreshToken(loginRequest.getEmail(),role);
-        return new LoginResponse(accessToken, refreshToken);
+        int idUser=account.getProfile().getIdProfile();
+        return new LoginResponse(accessToken, refreshToken,idUser,role);
     }
 
     public TokenResponse refreshAccessToken(RefreshTokenRequest refreshToken) {
@@ -86,7 +73,7 @@ public class AuthService {
         customer.setNumberPhone(registerDTO.getNumberPhone());
         customer.setBirthday(registerDTO.getBirthday());
         customer.setAccount(account);
-        customerRepository.save(customer);
+        profileRepository.save(customer);
     }
 
 

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
+import API_BASE_URL from "../../../config/apiConfig";
 
 export default function OrderDetail() {
   const { idOrder } = useParams();
@@ -10,7 +11,7 @@ export default function OrderDetail() {
     const fetchOrderDetail = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8080/order-detail/getOrderDetail_ByOrderId/${idOrder}`
+          `${API_BASE_URL}/order-detail/getOrderDetail_ByOrderId/${idOrder}`
         );
         setOrder(response.data);
       } catch (error) {
@@ -37,7 +38,7 @@ export default function OrderDetail() {
   const updateStatus = async (newStatus) => {
     try {
       const response = await axios.put(
-        `http://localhost:8080/order/update-status/${idOrder}`,
+        `${API_BASE_URL}/order/update-status/${idOrder}`,
         null,
         { params: { status: newStatus } }
       );
@@ -104,7 +105,7 @@ export default function OrderDetail() {
             className="flex border border-gray-200 rounded-lg p-4 shadow-sm"
           >
             <img
-              src={`http://localhost:8080/assets/${item.urlImage}`}
+              src={`${API_BASE_URL}/assets/${item.urlImage}`}
               alt={item.productName}
               className="w-24 h-24 object-cover rounded-md mr-4"
             />

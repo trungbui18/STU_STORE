@@ -2,23 +2,26 @@ import React, { useEffect, useState } from "react";
 import CartItem from "./CartItem";
 import CartSummary from "./CartSummary";
 import axios from "axios";
+import API_BASE_URL from "../../../config/apiConfig";
 
 const Cart = () => {
   const [listCartDetails, setListCartDetails] = useState([]);
-  const idCart = localStorage.getItem("idCart");
+  const idCart = sessionStorage.getItem("idCart");
 
   useEffect(() => {
-    const fetchAllCartDetails = async () => {
-      try {
-        const response = await axios.get(
-          `http://localhost:8080/cart-detail/getAll-ByCartId/${idCart}`
-        );
-        setListCartDetails(response.data);
-      } catch (error) {
-        console.log("Fail Loading: ", error);
-      }
-    };
-    fetchAllCartDetails();
+    if (idCart) {
+      const fetchCartDetails = async () => {
+        try {
+          const response = await axios.get(
+            `${API_BASE_URL}/cart-detail/getAll-ByCartId/${idCart}`
+          );
+          setListCartDetails(response.data);
+        } catch (error) {
+          console.error("Failed to load cart details:", error);
+        }
+      };
+      fetchCartDetails();
+    }
   }, [idCart]);
 
   const updateQuantity = async (idCartDetail, quantity, size) => {
@@ -28,7 +31,7 @@ const Cart = () => {
         size: size,
       };
       const response = await axios.put(
-        `http://localhost:8080/cart-detail/update/${idCartDetail}`,
+        `${API_BASE_URL}/cart-detail/update/${idCartDetail}`,
         updateDTO
       );
       setListCartDetails((prev) =>
@@ -45,9 +48,7 @@ const Cart = () => {
     const confirm = window.confirm("Bạn có chắc muốn xóa ko ? ");
     if (!confirm) return;
     try {
-      await axios.delete(
-        `http://localhost:8080/cart-detail/delete/${idCartDetail}`
-      );
+      await axios.delete(`${API_BASE_URL}/cart-detail/delete/${idCartDetail}`);
       setListCartDetails((prev) =>
         prev.filter((item) => item.idCartDetail !== idCartDetail)
       );
@@ -70,9 +71,11 @@ const Cart = () => {
           />
         ))}
       </div>
-      <div className="w-1/3">
-        <CartSummary cart={listCartDetails} />
-      </div>
+      {listCartDetails.length > 0 && (
+        <div className="w-1/3">
+          <CartSummary cart={listCartDetails} />
+        </div>
+      )}
     </div>
   );
 };

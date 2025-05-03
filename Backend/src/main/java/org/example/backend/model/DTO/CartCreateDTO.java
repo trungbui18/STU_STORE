@@ -10,5 +10,5 @@ import lombok.experimental.FieldDefaults;
 @ToString
 public class CartCreateDTO {
     int quantity;
-    int idCustomer;
+    int idProfile;
 }

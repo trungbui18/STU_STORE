@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Chart from "react-apexcharts";
 import * as XLSX from "xlsx";
+import API_BASE_URL from "../../../config/apiConfig";
 
 const RevenueExport = () => {
   const [startDate, setStartDate] = useState("");
@@ -8,14 +9,19 @@ const RevenueExport = () => {
   const [chartDate, setChartDate] = useState("");
   const [chartData, setChartData] = useState([]);
   const [exportData, setExportData] = useState([]);
-
+  const token = sessionStorage.getItem("token");
   const getToday = () => new Date().toLocaleDateString("sv-SE").split("T")[0];
 
   // Gọi API doanh thu theo khoảng ngày
   const fetchRevenueForExport = async (start, end) => {
     try {
       const res = await fetch(
-        `http://localhost:8080/order/revenue?startDate=${start}&endDate=${end}`
+        `${API_BASE_URL}/order/revenue?startDate=${start}&endDate=${end}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       if (!res.ok) throw new Error("Failed to fetch revenue");
       const data = await res.json();
@@ -31,7 +37,12 @@ const RevenueExport = () => {
   const fetchChartRevenue = async (date) => {
     try {
       const res = await fetch(
-        `http://localhost:8080/order/revenue/oneday?date=${date}`
+        `${API_BASE_URL}/order/revenue/oneday?date=${date}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       if (!res.ok) throw new Error("Failed to fetch chart revenue");
       const data = await res.json();

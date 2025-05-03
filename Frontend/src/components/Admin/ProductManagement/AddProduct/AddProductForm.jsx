@@ -3,6 +3,7 @@ import NewImagesUploader from "./NewImagesUploader";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
+import API_BASE_URL from "../../../../config/apiConfig";
 
 export default function AddProductForm() {
   const navigate = useNavigate();
@@ -63,7 +64,7 @@ export default function AddProductForm() {
     });
 
     axios
-      .post(`http://localhost:8080/product/create`, formData, {
+      .post(`${API_BASE_URL}/product/create`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       })
       .then((response) => {

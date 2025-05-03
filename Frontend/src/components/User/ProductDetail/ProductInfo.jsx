@@ -6,48 +6,42 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import AddToCartSection from "./AddToCartSection";
 import { useNavigate } from "react-router-dom"; // Thêm nếu dùng react-router-dom
+import API_BASE_URL from "../../../config/apiConfig";
 
 export default function ProductInfo({ product }) {
   const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);
   const [openSection, setOpenSection] = useState(null);
-  const [idCart, setIdCart] = useState(localStorage.getItem("idCart") || null);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const idCustomer = sessionStorage.getItem("idCustomer");
+  const [idCart, setIdCart] = useState(
+    sessionStorage.getItem("idCart") || null
+  );
+  const idCustomer = sessionStorage.getItem("idUser");
   const navigate = useNavigate();
   const toggleSection = (section) => {
     setOpenSection(openSection === section ? null : section);
   };
-
-  useEffect(() => {
-    if (idCart !== undefined && idCart !== null) {
-      localStorage.setItem("idCart", idCart);
-    }
-  }, [idCart]);
 
   const handleAddToCart = async (idProduct, selectedSize, quantity) => {
     if (!idCustomer) {
       setIsLoginModalOpen(true);
       return;
     }
-
-    let currentIdCart = idCart ? Number(idCart) : null;
-
-    if (!currentIdCart) {
+    let currentIdCart = idCart;
+    if (!idCart || idCart === "" || idCart === "null") {
+      console.log("Tạo giỏ hàng mới");
+      console.log("ID khách hàng:", idCustomer);
       const cart = {
-        idCustomer: idCustomer,
         quantity: 1,
+        idProfile: idCustomer,
       };
       try {
-        const response = await axios.post(
-          "http://localhost:8080/cart/create",
-          cart,
-          {
-            headers: { "Content-Type": "application/json" },
-          }
-        );
+        const response = await axios.post(`${API_BASE_URL}/cart/create`, cart, {
+          headers: { "Content-Type": "application/json" },
+        });
         currentIdCart = response.data.idCart;
         setIdCart(currentIdCart);
-        console.log("Tạo giỏ hàng thành công!");
+        sessionStorage.setItem("idCart", currentIdCart); // Lưu idCart vào sessionStorage
+        console.log("Tạo giỏ hàng thành công, idCart:", currentIdCart);
       } catch (error) {
         console.error("Lỗi tạo giỏ hàng: ", error);
         toast.error("Lỗi khi tạo giỏ hàng", { position: "top-right" });
@@ -56,14 +50,14 @@ export default function ProductInfo({ product }) {
     }
 
     const cartDetail = {
-      idCart: currentIdCart,
       idProduct: idProduct,
-      size: selectedSize,
+      idCart: currentIdCart,
       quantity: quantity,
+      size: selectedSize,
     };
 
     try {
-      await axios.post("http://localhost:8080/cart-detail/create", cartDetail, {
+      await axios.post(`${API_BASE_URL}/cart-detail/create`, cartDetail, {
         headers: { "Content-Type": "application/json" },
       });
       toast.success("Thêm vào giỏ hàng thành công", {

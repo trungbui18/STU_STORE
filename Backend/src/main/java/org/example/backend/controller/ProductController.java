@@ -19,8 +19,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-
-@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/product")
 public class ProductController {

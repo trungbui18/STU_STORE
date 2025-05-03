@@ -21,7 +21,7 @@ export default function EditProductForm() {
     const fetchProduct = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8080/product/getProduct/${id}`
+          `${API_BASE_URL}/product/getProduct/${id}`
         );
         const data = response.data;
         setProduct(data);
@@ -77,7 +77,7 @@ export default function EditProductForm() {
     formData.append("imagesDeleted", imagesToDelete);
 
     try {
-      await axios.put(`http://localhost:8080/product/update/${id}`, formData, {
+      await axios.put(`${API_BASE_URL}/product/update/${id}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       alert("Cập nhật thành công!");

@@ -9,7 +9,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @ToString
 public class CartDTO {
-    int idCart;
+    Integer idCart;
     int quantity;
-    int idProfile;
+
 }

@@ -20,7 +20,8 @@ public class Cart {
     int quantity;
 
     @OneToOne
-    @JoinColumn(name = "profile_id" ,nullable = false )
+    @JoinColumn(name = "profile_id" ,nullable = false , unique = true)
+    @JsonBackReference
     Profile profile;
 
     @OneToMany(mappedBy = "cart",cascade = CascadeType.ALL, orphanRemoval = true)

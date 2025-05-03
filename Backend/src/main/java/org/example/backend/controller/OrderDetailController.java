@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/order-detail")
 public class OrderDetailController {
     private final OrderService orderService;
-    OrderDetailService orderDetailService;
+    private final OrderDetailService orderDetailService;
 
     public OrderDetailController(OrderDetailService orderDetailService, OrderService orderService) {
         this.orderDetailService = orderDetailService;

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
+import API_BASE_URL from "../../../config/apiConfig";
 
 const UpdatePromotion = () => {
   const { idCoupon } = useParams();
@@ -17,7 +18,7 @@ const UpdatePromotion = () => {
   useEffect(() => {
     const fetchPromotion = async () => {
       await axios
-        .get(`http://localhost:8080/coupon/getById/${idCoupon}`)
+        .get(`${API_BASE_URL}/coupon/getById/${idCoupon}`)
         .then((res) => {
           const data = res.data;
           setFormData({
@@ -42,7 +43,7 @@ const UpdatePromotion = () => {
     e.preventDefault();
 
     axios
-      .put(`http://localhost:8080/coupon/update/${idCoupon}`, formData)
+      .put(`${API_BASE_URL}/coupon/update/${idCoupon}`, formData)
       .then((res) => {
         alert("Cập nhật thành công!");
         navigate("/admin/promotion"); // quay lại danh sách

@@ -4,15 +4,15 @@ import BillingInfo from "./BillingInfo";
 import ReviewOrder from "./ReviewOrder";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import API_BASE_URL from "../../../config/apiConfig";
 
 const useCartDetails = (idCart) => {
   const [listCartDetails, setListCartDetails] = useState([]);
-
   useEffect(() => {
     const fetchCartDetails = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8080/cart-detail/getAll-ByCartId/${idCart}`
+          `${API_BASE_URL}/cart-detail/getAll-ByCartId/${idCart}`
         );
         setListCartDetails(response.data);
       } catch (error) {
@@ -26,45 +26,43 @@ const useCartDetails = (idCart) => {
   return listCartDetails;
 };
 
-// Service để xử lý API calls
+const getToken = () => sessionStorage.getItem("token");
+
 const apiService = {
   createPayment: async (total) => {
+    const token = getToken();
     const response = await axios.post(
-      `http://localhost:8080/api/payment/create_payment?price=${total}`
-    );
-    return response.data;
-  },
-  createOrder: async (orderRequestDTO) => {
-    const response = await axios.post(
-      "http://localhost:8080/order/create",
-      orderRequestDTO
-    );
-    return response.data;
-  },
-  createCart: async (cart) => {
-    const response = await axios.post(
-      "http://localhost:8080/cart/create",
-      cart,
+      `${API_BASE_URL}/api/payment/create_payment?price=${total}`,
+      {},
       {
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       }
+    );
+    return response.data;
+  },
+
+  createOrder: async (orderRequestDTO) => {
+    const token = getToken();
+    console.log("token", token);
+    const response = await axios.post(
+      `${API_BASE_URL}/order/create`,
+      orderRequestDTO
     );
     return response.data;
   },
 };
 
-// Component Checkout
 const Checkout = () => {
-  // State
   const [address, setAddress] = useState("");
   const [fullName, setFullName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
 
-  // Data từ localStorage/sessionStorage
   const idCart = localStorage.getItem("idCart");
   const total = parseInt(sessionStorage.getItem("total")) || 0;
   const quantity = parseInt(sessionStorage.getItem("quantity")) || 0;
-  const idCustomer = parseInt(sessionStorage.getItem("idCustomer")) || 0;
+  const idCustomer = parseInt(sessionStorage.getItem("idUser")) || 0;
 
   const listCartDetails = useCartDetails(idCart);
   const navigate = useNavigate();
@@ -105,11 +103,8 @@ const Checkout = () => {
     try {
       const orderRequestDTO = buildOrderRequestDTO("Thanh Toán Khi Nhận Hàng");
       await apiService.createOrder(orderRequestDTO);
-      localStorage.removeItem("orderRequest");
-
+      console.log("order pendding: ", orderRequestDTO);
       const cart = { idCustomer, quantity: 0 };
-      await apiService.createCart(cart);
-
       alert("Đặt hàng thành công!");
       navigate("/");
     } catch (error) {

@@ -11,7 +11,7 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class OrderDTO {
-    int idCustomer;
+    int idProfile;
     String status;
     int totalPrice;
     String fullNameCustomer;

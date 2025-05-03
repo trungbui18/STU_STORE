@@ -7,6 +7,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import API_BASE_URL from "../../../../config/apiConfig";
 
 export default function SearchModal({ isSearchOpen, setIsSearchOpen }) {
   const navigate = useNavigate();
@@ -31,14 +32,11 @@ export default function SearchModal({ isSearchOpen, setIsSearchOpen }) {
     const fetchProducts = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(
-          "http://localhost:8080/product/search",
-          {
-            params: { keyword: debouncedKeyword },
-            headers: { "Content-Type": "application/json" },
-            withCredentials: true,
-          }
-        );
+        const response = await axios.get(`${API_BASE_URL}/product/search`, {
+          params: { keyword: debouncedKeyword },
+          headers: { "Content-Type": "application/json" },
+          withCredentials: true,
+        });
         setProducts(response.data);
       } catch (error) {
         console.error("Lỗi tìm kiếm:", error);
@@ -107,7 +105,7 @@ export default function SearchModal({ isSearchOpen, setIsSearchOpen }) {
                   {product.images && product.images.length > 0 ? (
                     <div className="w-full max-w-[250px] h-[250px]">
                       <img
-                        src={`http://localhost:8080/assets/${product.images[0].urlImage}`}
+                        src={`${API_BASE_URL}/assets/${product.images[0].urlImage}`}
                         alt={product.name}
                         className="w-full h-full object-cover rounded-lg"
                       />

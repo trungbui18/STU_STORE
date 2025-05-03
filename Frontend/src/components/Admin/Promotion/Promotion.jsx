@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, Plus, Trash2 } from "lucide-react";
+import API_BASE_URL from "../../../config/apiConfig";
 
 const Promotion = () => {
   const [couponList, setCouponList] = useState([]);
@@ -9,7 +10,7 @@ const Promotion = () => {
 
   const fetchCoupons = () => {
     axios
-      .get("http://localhost:8080/coupon/getAll")
+      .get(`${API_BASE_URL}/coupon/getAll`)
       .then((res) => setCouponList(res.data))
       .catch((err) => console.error("Lỗi khi load coupon:", err));
   };
@@ -23,7 +24,7 @@ const Promotion = () => {
     if (!confirm) return;
 
     axios
-      .delete(`http://localhost:8080/coupon/delete/${id}`)
+      .delete(`${API_BASE_URL}/coupon/delete/${id}`)
       .then((res) => {
         fetchCoupons();
       })

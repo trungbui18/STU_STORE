@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Eye } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import API_BASE_URL from "../../../config/apiConfig";
 
 const OrderManagerment = () => {
   const [orders, setOrders] = useState([]);
@@ -11,7 +12,7 @@ const OrderManagerment = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:8080/order/getAll")
+      .get(`${API_BASE_URL}/order/getAll`)
       .then((res) => {
         setOrders(res.data);
         setFilteredOrders(res.data);

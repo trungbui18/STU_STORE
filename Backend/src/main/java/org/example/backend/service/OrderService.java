@@ -16,33 +16,26 @@ import java.util.stream.Collectors;
 @Service
 public class OrderService {
     private final OrderRepository orderRepository;
-    private final CustomerRepository customerRepository;
+    private final ProfileRepository profileRepository;
     private final OrderMapper orderMapper;
     private final OrderDetailRepository orderDetailRepository;
     private final ProductRepository productRepository;
     private final ProductSizeRepository productSizeRepository;
     private final OrderDetailMapper orderDetailMapper;
     private final CartRepository cartRepository;
+    private final CartDetailRepository cartDetailRepository;
     private final CouponRepository couponRepository;
 
-    public OrderService(
-            OrderRepository orderRepository,
-            CustomerRepository customerRepository,
-            OrderMapper orderMapper,
-            OrderDetailRepository orderDetailRepository,
-            ProductRepository productRepository,
-            ProductSizeRepository productSizeRepository,
-            OrderDetailMapper orderDetailMapper,
-            CartRepository cartRepository,
-            CouponRepository couponRepository) {
+    public OrderService(OrderRepository orderRepository, ProfileRepository profileRepository, OrderMapper orderMapper, OrderDetailRepository orderDetailRepository, ProductRepository productRepository, ProductSizeRepository productSizeRepository, OrderDetailMapper orderDetailMapper, CartRepository cartRepository, CartDetailRepository cartDetailRepository, CouponRepository couponRepository) {
         this.orderRepository = orderRepository;
-        this.customerRepository = customerRepository;
+        this.profileRepository = profileRepository;
         this.orderMapper = orderMapper;
         this.orderDetailRepository = orderDetailRepository;
         this.productRepository = productRepository;
         this.productSizeRepository = productSizeRepository;
         this.orderDetailMapper = orderDetailMapper;
         this.cartRepository = cartRepository;
+        this.cartDetailRepository = cartDetailRepository;
         this.couponRepository = couponRepository;
     }
 
@@ -52,8 +45,8 @@ public class OrderService {
         return allOrders;
     }
 
-    public Order orderUpdate(int idOrder,String status) {
-        Order order=orderRepository.findById(idOrder).orElseThrow(()->new RuntimeException("Order not found"));
+    public Order orderUpdate(int idOrder, String status) {
+        Order order = orderRepository.findById(idOrder).orElseThrow(() -> new RuntimeException("Order not found"));
         order.setStatus(status);
         orderRepository.save(order);
         return order;
@@ -74,7 +67,7 @@ public class OrderService {
 
         // Tạo OrderResponseDTO
         OrderResponseDTO responseDTO = new OrderResponseDTO();
-        responseDTO.setIdCustomer(order.getProfile().getIdProfile());
+        responseDTO.setIdProfile(order.getProfile().getIdProfile());
         responseDTO.setStatus(order.getStatus());
         responseDTO.setTotalPrice(order.getTotalPrice());
         responseDTO.setFullNameCustomer(order.getFullNameCustomer());
@@ -97,49 +90,56 @@ public class OrderService {
     }
 
 
-
-
     @Transactional
     public Order createOrderWithDetails(OrderRequestDTO request) {
-        // 1. Tạo đơn hàng từ OrderDTO
         OrderDTO orderDTO = request.getOrder();
         Order order = orderMapper.mapOrderDtoToOrder(orderDTO);
-        Profile customer = customerRepository.findById(orderDTO.getIdCustomer())
-                .orElseThrow(() -> new RuntimeException("Customer not found with id: " + orderDTO.getIdCustomer()));
-        order.setProfile(customer);
-        Order savedOrder = orderRepository.save(order); // Lưu đơn hàng vào DB
 
-        // 2. Tạo và lưu danh sách chi tiết đơn hàng
+        Profile customer = profileRepository.findById(orderDTO.getIdProfile())
+                .orElseThrow(() -> new RuntimeException("Customer not found with id: " + orderDTO.getIdProfile()));
+        order.setProfile(customer);
+
+        Order savedOrder = orderRepository.save(order);
+
         List<OrderDetailDTO> orderDetailDTOs = request.getOrderDetails();
         if (orderDetailDTOs != null && !orderDetailDTOs.isEmpty()) {
+            List<OrderDetail> orderDetailsToSave = new ArrayList<>();
+
             for (OrderDetailDTO detailDTO : orderDetailDTOs) {
                 Product product = productRepository.findById(detailDTO.getIdProduct())
                         .orElseThrow(() -> new RuntimeException("Product not found with id: " + detailDTO.getIdProduct()));
 
                 OrderDetail orderDetail = orderDetailMapper.mapOrderDetail(detailDTO);
                 orderDetail.setProduct(product);
-                orderDetail.setOrder(savedOrder); // Liên kết với đơn hàng vừa tạo
+                orderDetail.setOrder(savedOrder);
                 orderDetail.setSize(detailDTO.getSize());
 
                 ProductSize productSize = productSizeRepository.findByProduct_IdProductAndSize(product.getIdProduct(), detailDTO.getSize())
                         .orElseThrow(() -> new RuntimeException("Product size not found for product " + product.getIdProduct() + " and size " + detailDTO.getSize()));
+
                 if (productSize.getQuantity() < orderDetail.getQuantity()) {
                     throw new RuntimeException("Not enough stock for product " + product.getIdProduct() + " size " + detailDTO.getSize());
                 }
+
                 productSize.setQuantity(productSize.getQuantity() - orderDetail.getQuantity());
                 productSizeRepository.save(productSize);
 
-                orderDetailRepository.save(orderDetail);
+                orderDetailsToSave.add(orderDetail);
             }
+
+            orderDetailRepository.saveAll(orderDetailsToSave); // insert tất cả cùng lúc
         }
 
-
-
-        // 4. Tạo Cart mới
-        Cart cart = new Cart();
-        cart.setProfile(customer);
+        Cart cart = cartRepository.findByProfile_IdProfile(customer.getIdProfile())
+                .orElseGet(() -> {
+                    Cart newCart = new Cart();
+                    newCart.setProfile(customer);
+                    return newCart;
+                });
+        cartDetailRepository.deleteAllByCart_IdCart(cart.getIdCart());
         cart.setQuantity(0);
         cartRepository.save(cart);
 
         return savedOrder;
-    }}
+    }
+}

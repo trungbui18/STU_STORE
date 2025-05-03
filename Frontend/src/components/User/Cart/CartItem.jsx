@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
+import API_BASE_URL from "../../../config/apiConfig";
 
 const CartItem = ({ item, listCartDetails, updateQuantity, removeItem }) => {
   const [tempQuantity, setTempQuantity] = useState(item.quantity);
@@ -20,7 +21,7 @@ const CartItem = ({ item, listCartDetails, updateQuantity, removeItem }) => {
       if (tempQuantity !== item.quantity || tempSize !== item.size) {
         try {
           const response = await axios.post(
-            "http://localhost:8080/cart-detail/check-quantity",
+            `${API_BASE_URL}/cart-detail/check-quantity`,
             {
               idProduct: item.idProduct,
               size: tempSize,
@@ -100,7 +101,7 @@ const CartItem = ({ item, listCartDetails, updateQuantity, removeItem }) => {
   return (
     <div className="flex border p-4 rounded-lg mb-4">
       <img
-        src={`http://localhost:8080/assets/${item.urlImage}`}
+        src={`${API_BASE_URL}/assets/${item.urlImage}`}
         alt={item.productName}
         className="w-32 h-32 object-cover"
       />

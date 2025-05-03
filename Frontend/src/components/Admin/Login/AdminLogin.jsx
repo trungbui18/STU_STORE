@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import API_BASE_URL from "../../../config/apiConfig";
+import axios from "axios";
 
 export default function AdminLogin() {
   const [username, setUsername] = useState("");
@@ -9,29 +11,30 @@ export default function AdminLogin() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    const data = {
+      email: username,
+      password: password,
+    };
     try {
-      const response = await fetch("http://localhost:8080/auth/admin/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          userName: username,
-          password: password,
-        }),
-      });
+      const response = await axios.post(
+        `${API_BASE_URL}/auth/login`,
+        data,
+        { withCredentials: true } // giống credentials: "include" trong fetch
+      );
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        setError(errorData.message || "Đăng nhập thất bại");
-        return;
+      const resData = response.data;
+      sessionStorage.setItem("token", resData.accessToken);
+      sessionStorage.setItem("idStaff", resData.idUser);
+      alert("Đăng nhập thành công");
+
+      // Chuyển hướng nếu cần
+      navigate("/admin/dashboard"); // ví dụ
+    } catch (error) {
+      if (error.response && error.response.data) {
+        setError(error.response.data.message || "Đăng nhập thất bại");
+      } else {
+        setError("Lỗi máy chủ. Vui lòng thử lại sau.");
       }
-
-      const data = await response.json();
-      sessionStorage.setItem("idStaff", data.id);
-      navigate("/admin/dashboard");
-    } catch (err) {
-      setError("Lỗi máy chủ. Vui lòng thử lại sau.");
     }
   };
 

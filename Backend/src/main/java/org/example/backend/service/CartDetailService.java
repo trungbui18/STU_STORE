@@ -9,10 +9,8 @@ import org.example.backend.model.DTO.CheckProductQuantityDTO;
 import org.example.backend.model.Product;
 import org.example.backend.model.ProductSize;
 import org.example.backend.model.mapper.CartDetailMapper;
-import org.example.backend.model.mapper.ProductMapper;
 import org.example.backend.repository.CartDetailRepository;
 import org.example.backend.repository.CartRepository;
-import org.example.backend.repository.CustomerRepository;
 import org.example.backend.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 

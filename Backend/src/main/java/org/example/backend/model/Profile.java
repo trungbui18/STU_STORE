@@ -1,5 +1,6 @@
 package org.example.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -27,9 +28,11 @@ public class Profile {
 
     @OneToOne
     @JoinColumn(name = "account_id" , unique = true )
+    @JsonBackReference
     Account account;
 
     @OneToOne(mappedBy = "profile",cascade = CascadeType.ALL,orphanRemoval = true)
+    @JsonManagedReference
     Cart cart;
 
     @OneToMany(mappedBy = "profile",cascade = CascadeType.ALL,orphanRemoval = true)

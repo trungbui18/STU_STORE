@@ -43,7 +43,7 @@ public class CartController {
     @PostMapping("/create")
     public ResponseEntity<?> createCart(@RequestBody CartCreateDTO cartDTO) {
         try {
-            Cart cart=cartService.CreateCart(cartDTO);
+            CartDTO cart=cartService.CreateCart(cartDTO);
             return ResponseEntity.ok(cart);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body("Dữ liệu không hợp lệ: " + e.getMessage());

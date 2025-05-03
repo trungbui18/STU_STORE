@@ -7,7 +7,6 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface CartMapper {
-    @Mapping(source = "profile.idProfile", target = "idProfile")
     CartDTO toCartDTO(Cart cart);
 
 

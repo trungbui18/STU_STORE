@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
+import API_BASE_URL from "../../../config/apiConfig";
 
 const AddPromotion = () => {
   const navigate = useNavigate();
@@ -35,7 +36,7 @@ const AddPromotion = () => {
       return;
     }
 
-    fetch("http://localhost:8080/coupon/create", {
+    fetch(`${API_BASE_URL}/coupon/create`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

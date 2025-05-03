@@ -6,37 +6,40 @@ import org.example.backend.model.DTO.CartDTO;
 import org.example.backend.model.Profile;
 import org.example.backend.model.mapper.CartMapper;
 import org.example.backend.repository.CartRepository;
-import org.example.backend.repository.CustomerRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.example.backend.repository.ProfileRepository;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class CartService {
     CartRepository cartRepository;
-    CustomerRepository customerRepository;
+    ProfileRepository profileRepository;
     CartMapper cartMapper;
 
-    public CartService(CartRepository cartRepository, CustomerRepository customerRepository, CartMapper cartMapper) {
+    public CartService(CartRepository cartRepository, ProfileRepository profileRepository, CartMapper cartMapper) {
         this.cartRepository = cartRepository;
-        this.customerRepository = customerRepository;
+        this.profileRepository = profileRepository;
         this.cartMapper = cartMapper;
     }
 
-    public Cart CreateCart(CartCreateDTO cartDTO) {
-        Profile customer = customerRepository.findById(cartDTO.getIdCustomer()).orElseThrow(()->new RuntimeException("ko tim thay user"));
+    public CartDTO CreateCart(CartCreateDTO cartDTO) {
+        Profile customer = profileRepository.findById(cartDTO.getIdProfile()).orElseThrow(()->new RuntimeException("ko tim thay user"));
         Cart cart = new Cart();
         cart.setProfile(customer);
         cart.setQuantity(cartDTO.getQuantity());
-        return cartRepository.save(cart);
+        cartRepository.save(cart);
+        return cartMapper.toCartDTO(cart);
     }
 
     public CartDTO GetCart(int idUser) {
-        Cart cart=cartRepository.findByProfile_IdProfile(idUser).orElseThrow(()->new RuntimeException("ko tim thay user"));
-        if(cart==null){
-            return new CartDTO(0,0,idUser);
+        Optional<Cart> optionalCart = cartRepository.findByProfile_IdProfile(idUser);
+        if (optionalCart.isEmpty()) {
+            return new CartDTO(null, 0);
         }
-        return cartMapper.toCartDTO(cart);
+        return cartMapper.toCartDTO(optionalCart.get());
     }
+
 
     public Cart updateCart(CartDTO cartDTO){
         Cart cart=cartRepository.findById(cartDTO.getIdCart()).orElseThrow(()->new RuntimeException("ko tim thay cart user"));

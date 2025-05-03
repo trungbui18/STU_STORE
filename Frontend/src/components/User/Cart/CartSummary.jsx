@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { MoveRight, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import API_BASE_URL from "../../../config/apiConfig";
 
 const CartSummary = ({ cart }) => {
   const navigate = useNavigate();
@@ -42,7 +43,7 @@ const CartSummary = ({ cart }) => {
 
     try {
       const response = await axios.get(
-        `http://localhost:8080/coupon/exists/${promoCode}`
+        `${API_BASE_URL}/coupon/exists/${promoCode}`
       );
       const { check, code, percentDiscount, message } = response.data;
 

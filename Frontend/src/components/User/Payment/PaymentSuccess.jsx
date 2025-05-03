@@ -2,25 +2,22 @@ import React, { useEffect, useState } from "react";
 import { CheckCircle } from "lucide-react";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
+import API_BASE_URL from "../../../config/apiConfig";
 
 // Service để xử lý API
 const apiService = {
   createOrder: async (orderRequest) => {
     const response = await axios.post(
-      "http://localhost:8080/order/create",
+      `${API_BASE_URL}/order/create`,
 
       orderRequest
     );
     return response.data;
   },
   createCart: async (cart) => {
-    const response = await axios.post(
-      "http://localhost:8080/cart/create",
-      cart,
-      {
-        headers: { "Content-Type": "application/json" },
-      }
-    );
+    const response = await axios.post(`${API_BASE_URL}/cart/create`, cart, {
+      headers: { "Content-Type": "application/json" },
+    });
     return response.data;
   },
 };

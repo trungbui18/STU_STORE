@@ -8,9 +8,10 @@ import {
 import SearchModal from "./SearchBar/SearchModal";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import API_BASE_URL from "../../../config/apiConfig";
 
 export default function UserActions() {
-  const idUser = sessionStorage.getItem("idCustomer");
+  const idUser = sessionStorage.getItem("idUser");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false); // Trạng thái cho dropdown
   const [cart, setCart] = useState(null);
@@ -20,10 +21,11 @@ export default function UserActions() {
     const fetchCart = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8080/cart/cart-by-idUser/${idUser}`
+          `${API_BASE_URL}/cart/cart-by-idUser/${idUser}`
         );
         setCart(response.data);
-        localStorage.setItem("idCart", response.data.idCart);
+        console.log("Giỏ hàng:", response.data);
+        sessionStorage.setItem("idCart", response.data.idCart);
       } catch (error) {
         console.error("Failed to fetch cart:", error);
       }
@@ -33,8 +35,6 @@ export default function UserActions() {
     }
   }, [idUser]);
 
-  // Xử lý hiển thị/ẩn dropdown
-  // Xử lý hiển thị/ẩn dropdown
   const toggleDropdown = () => {
     if (!idUser) {
       navigate("/user/login");
@@ -45,15 +45,10 @@ export default function UserActions() {
 
   // Xử lý đăng xuất
   const handleLogout = () => {
-    // Xóa toàn bộ dữ liệu trong localStorage và sessionStorage
     localStorage.clear();
     sessionStorage.clear();
-
-    // Đóng dropdown
     setIsDropdownOpen(false);
-
-    // Điều hướng về trang chính hoặc trang đăng nhập
-    navigate("/"); // Hoặc navigate("/user/login") nếu muốn về trang đăng nhập
+    navigate("/");
   };
 
   return (
@@ -82,8 +77,16 @@ export default function UserActions() {
           )}
         </div>
 
-        <div className="relative text-xl" onClick={() => navigate("/cart")}>
+        <div
+          className="relative text-xl cursor-pointer"
+          onClick={() => navigate("/cart")}
+        >
           <FontAwesomeIcon icon={faBookmark} />
+          {cart?.quantity > 0 && (
+            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1">
+              {cart.quantity}
+            </span>
+          )}
         </div>
       </div>
 

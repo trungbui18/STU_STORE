@@ -3,6 +3,7 @@ import axios from "axios";
 import { debounce } from "lodash";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import API_BASE_URL from "../../../config/apiConfig";
 
 const AddToCartSection = ({ product, onAddToCart }) => {
   const [selectedSize, setSelectedSize] = useState(null);
@@ -13,7 +14,7 @@ const AddToCartSection = ({ product, onAddToCart }) => {
   const checkStockQuantity = async (idProduct, size, quantity) => {
     try {
       const response = await axios.post(
-        "http://localhost:8080/cart-detail/check-quantity",
+        `${API_BASE_URL}/cart-detail/check-quantity`,
         {
           idProduct: idProduct,
           size: size,
@@ -82,7 +83,7 @@ const AddToCartSection = ({ product, onAddToCart }) => {
       <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
         {product.sizes.map((size) => (
           <button
-            key={size.idProductSize}
+            key={size.size}
             className={`p-2 sm:p-3 border text-sm sm:text-lg font-medium transition ${
               selectedSize === size.size
                 ? "bg-black text-white border-black"

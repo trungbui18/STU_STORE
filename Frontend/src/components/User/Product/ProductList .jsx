@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import ProductCard from "./ProductCard";
+import API_BASE_URL from "../../../config/apiConfig";
 const ProductList = () => {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
+    const accessToken = sessionStorage.getItem("token");
+    console.log("Access Token:", accessToken);
     axios
-      .get("http://localhost:8080/product/getAll")
+      .get(`${API_BASE_URL}/product/getAll`)
       .then((response) => {
         setProducts(response.data);
       })

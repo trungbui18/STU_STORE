@@ -8,6 +8,7 @@ import hinh3 from "../../../assets/hinh4.avif";
 import { useEffect } from "react";
 import axios from "axios";
 import { useState } from "react";
+import API_BASE_URL from "../../../config/apiConfig";
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -17,7 +18,7 @@ export default function ProductDetail() {
     const fetchProduct = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8080/product/getProduct/${id}`
+          `${API_BASE_URL}/product/getProduct/${id}`
         );
         setProduct(response.data);
       } catch (error) {

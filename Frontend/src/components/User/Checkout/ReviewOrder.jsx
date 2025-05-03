@@ -1,4 +1,5 @@
 import React from "react";
+import API_BASE_URL from "../../../config/apiConfig";
 
 const ReviewOrder = ({ cartItems = [] }) => {
   return (
@@ -14,7 +15,7 @@ const ReviewOrder = ({ cartItems = [] }) => {
             {/* Ảnh bên trái */}
             <div className="w-20 h-20 flex-shrink-0">
               <img
-                src={`http://localhost:8080/assets/${item.urlImage}`}
+                src={`${API_BASE_URL}/assets/${item.urlImage}`}
                 alt={item.productName}
                 className="w-full h-full object-cover rounded"
               />

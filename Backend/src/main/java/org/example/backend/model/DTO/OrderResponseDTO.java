@@ -13,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class OrderResponseDTO {
-    int idCustomer;
+    int idProfile;
     String status;
     int totalPrice;
     String fullNameCustomer;

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Eye, Trash2, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import API_BASE_URL from "../../../config/apiConfig";
 export default function ProductManagement() {
   const [listProduct, setListProduct] = useState([]);
   const [selectedImage, setSelectedImage] = useState(null);
@@ -11,7 +12,7 @@ export default function ProductManagement() {
   useEffect(() => {
     const FetchProduct = async () => {
       await axios
-        .get(`http://localhost:8080/product/getAll`)
+        .get(`${API_BASE_URL}/product/getAll`)
         .then((response) => {
           setListProduct(response.data);
         })
@@ -28,7 +29,7 @@ export default function ProductManagement() {
     );
     if (!confirm) return;
     try {
-      await axios.delete(`http://localhost:8080/product/delete/${idProduct}`);
+      await axios.delete(`${API_BASE_URL}/product/delete/${idProduct}`);
       console.log("Xóa thành công sản phẩm có ID:", idProduct);
 
       setListProduct((prevProducts) =>
@@ -80,13 +81,13 @@ export default function ProductManagement() {
                   className="w-full h-full relative group cursor-pointer"
                   onClick={() =>
                     setSelectedImage(
-                      `http://localhost:8080/assets/${product.images[0].urlImage}`
+                      `${API_BASE_URL}/assets/${product.images[0].urlImage}`
                     )
                   }
                 >
                   {product.images?.length > 0 && (
                     <img
-                      src={`http://localhost:8080/assets/${product.images[0].urlImage}`}
+                      src={`${API_BASE_URL}/assets/${product.images[0].urlImage}`}
                       className="w-full h-full object-cover transition-opacity duration-300 group-hover:opacity-50"
                       alt="Product"
                     />

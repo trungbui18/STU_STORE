@@ -26,7 +26,7 @@ export default function OldImages({
             onClick={() => handleImageClick(img.idImage)}
           >
             <img
-              src={`http://localhost:8080/assets/${img.urlImage}`}
+              src={`${API_BASE_URL}/assets/${img.urlImage}`}
               alt="Product"
               className="w-full h-auto object-cover rounded-lg shadow"
             />
