@@ -23,12 +23,15 @@ export default function AdminLogin() {
       );
 
       const resData = response.data;
+      if (resData.role != "STAFF") {
+        alert("Bạn không có quyền truy cập vào trang này");
+        return;
+      }
       sessionStorage.setItem("token", resData.accessToken);
       sessionStorage.setItem("idStaff", resData.idUser);
       alert("Đăng nhập thành công");
 
-      // Chuyển hướng nếu cần
-      navigate("/admin/dashboard"); // ví dụ
+      navigate("/admin/dashboard");
     } catch (error) {
       if (error.response && error.response.data) {
         setError(error.response.data.message || "Đăng nhập thất bại");

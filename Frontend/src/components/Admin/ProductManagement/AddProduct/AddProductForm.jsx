@@ -13,6 +13,7 @@ export default function AddProductForm() {
   const [description, setDescription] = useState("");
   const size = ["S", "M", "L", "XL", "XXL"];
   const idStaff = sessionStorage.getItem("idStaff") || 0;
+  const token = sessionStorage.getItem("token") || null;
   const [sizes, setSizes] = useState(
     size.map((s) => ({ size: s, quantity: 0 }))
   );
@@ -53,7 +54,6 @@ export default function AddProductForm() {
       price: price,
       description: description,
       sizes: sizes,
-      idStaff: idStaff,
     };
 
     formData.append("product", JSON.stringify(product));
@@ -65,7 +65,10 @@ export default function AddProductForm() {
 
     axios
       .post(`${API_BASE_URL}/product/create`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+        },
       })
       .then((response) => {
         console.log("Thêm thành công", response.data);

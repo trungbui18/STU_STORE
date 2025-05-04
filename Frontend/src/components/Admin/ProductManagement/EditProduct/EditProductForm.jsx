@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import OldImages from "./OldImages";
 import NewImagesUploader from "./NewImagesUploader";
+import API_BASE_URL from "../../../../config/apiConfig";
 
 export default function EditProductForm() {
   const navigate = useNavigate();
@@ -14,7 +15,8 @@ export default function EditProductForm() {
   const [imagesToDelete, setImagesToDelete] = useState([]);
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
-
+  const [description, setDescription] = useState("");
+  const token = sessionStorage.getItem("token") || null;
   const { id } = useParams();
   const idStaff = sessionStorage.getItem("idStaff");
   useEffect(() => {
@@ -28,6 +30,7 @@ export default function EditProductForm() {
         setSizes(data.sizes || []);
         setName(data.name);
         setPrice(data.price);
+        setDescription(data.description || "");
       } catch (error) {
         console.log("fail:", error);
       }
@@ -38,7 +41,7 @@ export default function EditProductForm() {
   const handleQuantityChange = (id, newQuantity) => {
     setSizes((prevSizes) =>
       prevSizes.map((size) =>
-        size.idProductSize === id ? { ...size, quantity: newQuantity } : size
+        size.size === id ? { ...size, quantity: newQuantity } : size
       )
     );
   };
@@ -60,8 +63,8 @@ export default function EditProductForm() {
     const updatedProduct = JSON.stringify({
       name: name,
       price: price,
+      description: description,
       sizes: sizes,
-      idStaff: idStaff,
     });
 
     console.log("Updated Product: ", updatedProduct);
@@ -78,7 +81,10 @@ export default function EditProductForm() {
 
     try {
       await axios.put(`${API_BASE_URL}/product/update/${id}`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+        },
       });
       alert("Cập nhật thành công!");
       navigate("/admin/product");
@@ -127,13 +133,24 @@ export default function EditProductForm() {
             required
           />
         </div>
+        <div className="mb-3">
+          <label className="block font-semibold">Mô tả sản phẩm</label>
+          <textarea
+            name="description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            className="w-full border px-3 py-2 rounded"
+            rows={4}
+            required
+          />
+        </div>
 
         <div className="mb-8">
           <label className="block font-semibold text-lg mb-2">Size</label>
           <div className="grid grid-cols-3 lg:grid-cols-5 gap-3">
             {sizes.map((size) => (
               <div
-                key={size.idProductSize}
+                key={size.size}
                 className="flex flex-flex gap-2 items-center px-4 py-2 shadow-sm"
               >
                 <span className="font-medium text-gray-700">{size.size}</span>
@@ -142,7 +159,7 @@ export default function EditProductForm() {
                   name="size"
                   value={size.quantity}
                   onChange={(e) =>
-                    handleQuantityChange(size.idProductSize, e.target.value)
+                    handleQuantityChange(size.size, e.target.value)
                   }
                   className="w-16 border py-2 rounded bg-gray-200 text-center"
                   required
