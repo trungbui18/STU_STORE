@@ -1,5 +1,6 @@
 package org.example.backend.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.example.backend.config.VNPAYConfig;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,8 +18,9 @@ import java.util.*;
 @RequestMapping("/api/payment")
 public class PaymentController {
     @PostMapping ("/create_payment")
-    public ResponseEntity<String> createPayment(@RequestParam("price") Long price
+    public ResponseEntity<String> createPayment(@RequestParam("price") Long price, HttpServletRequest request
                                                 ) throws UnsupportedEncodingException {
+
         // Get parameters from request
         String vnp_Version = "2.1.0";
         String vnp_Command = "pay";

@@ -51,7 +51,9 @@ public class SecurityConfig {
                                  "/coupon/create","/coupon/delete/{idCoupon}","/coupon/update/{idCoupon}",
                                  "/coupon/getById/{idCoupon}","/coupon/getAll","/order/getAll","order/revenue/oneday",
                                  "/order/revenue/oneday").hasRole("STAFF")
-                .anyRequest().authenticated()
+                        .requestMatchers("/api/payment/**").authenticated()
+
+                        .anyRequest().authenticated()
         )
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt

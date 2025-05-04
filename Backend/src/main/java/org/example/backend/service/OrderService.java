@@ -120,7 +120,7 @@ public class OrderService {
                 if (productSize.getQuantity() < orderDetail.getQuantity()) {
                     throw new RuntimeException("Not enough stock for product " + product.getIdProduct() + " size " + detailDTO.getSize());
                 }
-
+                System.out.println("Giam productsize");
                 productSize.setQuantity(productSize.getQuantity() - orderDetail.getQuantity());
                 productSizeRepository.save(productSize);
 
@@ -139,7 +139,6 @@ public class OrderService {
         cartDetailRepository.deleteAllByCart_IdCart(cart.getIdCart());
         cart.setQuantity(0);
         cartRepository.save(cart);
-
         return savedOrder;
     }
 }

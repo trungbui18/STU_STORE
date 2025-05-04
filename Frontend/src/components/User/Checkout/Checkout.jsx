@@ -31,6 +31,7 @@ const getToken = () => sessionStorage.getItem("token");
 const apiService = {
   createPayment: async (total) => {
     const token = getToken();
+    console.log("token", token);
     const response = await axios.post(
       `${API_BASE_URL}/api/payment/create_payment?price=${total}`,
       {},
@@ -59,7 +60,7 @@ const Checkout = () => {
   const [fullName, setFullName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
 
-  const idCart = localStorage.getItem("idCart");
+  const idCart = sessionStorage.getItem("idCart");
   const total = parseInt(sessionStorage.getItem("total")) || 0;
   const quantity = parseInt(sessionStorage.getItem("quantity")) || 0;
   const idCustomer = parseInt(sessionStorage.getItem("idUser")) || 0;
@@ -69,7 +70,7 @@ const Checkout = () => {
 
   const buildOrderRequestDTO = (statusPayment) => ({
     order: {
-      idCustomer,
+      idProfile: idCustomer,
       status: "PENDDING",
       totalPrice: total,
       fullNameCustomer: fullName,
@@ -89,7 +90,7 @@ const Checkout = () => {
   const handlePayment = async () => {
     try {
       const orderRequestDTO = buildOrderRequestDTO("Thanh Toán Thành Công");
-      localStorage.setItem("orderRequest", JSON.stringify(orderRequestDTO));
+      sessionStorage.setItem("orderRequest", JSON.stringify(orderRequestDTO));
       const paymentUrl = await apiService.createPayment(total);
       window.open(paymentUrl);
       navigate("/");
@@ -100,16 +101,19 @@ const Checkout = () => {
 
   // Xử lý đặt hàng
   const handleCheckOut = async () => {
+    if (!listCartDetails || listCartDetails.length === 0) {
+      alert("Chưa tải xong chi tiết giỏ hàng. Vui lòng đợi...");
+      return;
+    }
+
     try {
       const orderRequestDTO = buildOrderRequestDTO("Thanh Toán Khi Nhận Hàng");
+      console.log("OrderRequestDTO:", orderRequestDTO);
       await apiService.createOrder(orderRequestDTO);
-      console.log("order pendding: ", orderRequestDTO);
-      const cart = { idCustomer, quantity: 0 };
       alert("Đặt hàng thành công!");
-      navigate("/");
     } catch (error) {
       console.error("Failed to checkout:", error);
-      alert("Có lỗi trong quá trình đặt hàng, vui lòng thử lại sau!");
+      alert("Có lỗi trong quá trình đặt hàng!");
     }
   };
 

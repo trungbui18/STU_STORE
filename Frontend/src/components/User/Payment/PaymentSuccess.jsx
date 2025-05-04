@@ -29,7 +29,7 @@ const formatOrderInfo = (order) => {
     const day = String(date.getDate()).padStart(2, "0");
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const year = date.getFullYear();
-    return `${day}/${month}/${year}`; // Kết quả: 13/04/2025
+    return `${day}/${month}/${year}`;
   };
 
   const getDateForOrderId = (dateString) => {
@@ -38,7 +38,7 @@ const formatOrderInfo = (order) => {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const day = String(date.getDate()).padStart(2, "0");
-    return `${year}${month}${day}`; // Kết quả: 20250413
+    return `${year}${month}${day}`;
   };
 
   return {
@@ -65,8 +65,6 @@ const PaymentSuccess = () => {
   const queryParams = new URLSearchParams(location.search);
   const vnpTransactionStatus = queryParams.get("vnp_TransactionStatus");
 
-  const idCustomer = localStorage.getItem("id_customer");
-
   useEffect(() => {
     const handleOrderCreation = async () => {
       if (vnpTransactionStatus !== "00") {
@@ -75,9 +73,9 @@ const PaymentSuccess = () => {
         return;
       }
 
-      const orderRequest = JSON.parse(localStorage.getItem("orderRequest"));
+      const orderRequest = JSON.parse(sessionStorage.getItem("orderRequest"));
       if (!orderRequest) {
-        console.warn("No order data found in localStorage");
+        console.warn("No order data found in sessionStorage");
         setIsLoading(false);
         return;
       }
@@ -87,21 +85,10 @@ const PaymentSuccess = () => {
         const orderData = await apiService.createOrder(orderRequest);
         setOrderSaved(orderData);
         console.log("Order created successfully:", orderData);
-        localStorage.removeItem("orderRequest");
       } catch (error) {
         console.error("Failed to create order:", error);
       } finally {
         setIsLoading(false);
-      }
-
-      if (!idCustomer) return;
-
-      const cart = { idCustomer, quantity: 0 };
-      try {
-        await apiService.createCart(cart);
-        console.log("Cart created successfully");
-      } catch (error) {
-        console.error("Failed to create cart:", error);
       }
     };
 
