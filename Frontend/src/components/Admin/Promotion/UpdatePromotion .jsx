@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
-import API_BASE_URL from "../../../config/apiConfig";
-
+import axiosInstance from "../../../config/axiosInstance";
 const UpdatePromotion = () => {
   const { idCoupon } = useParams();
   const navigate = useNavigate();
+  const token = sessionStorage.getItem("token") || null;
   const [formData, setFormData] = useState({
     couponName: "",
     discount_percent: "",
@@ -17,8 +17,12 @@ const UpdatePromotion = () => {
 
   useEffect(() => {
     const fetchPromotion = async () => {
-      await axios
-        .get(`${API_BASE_URL}/coupon/getById/${idCoupon}`)
+      await axiosInstance
+        .get(`/coupon/getById/${idCoupon}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
         .then((res) => {
           const data = res.data;
           setFormData({
@@ -42,8 +46,13 @@ const UpdatePromotion = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    axios
-      .put(`${API_BASE_URL}/coupon/update/${idCoupon}`, formData)
+    axiosInstance
+      .put(`/coupon/update/${idCoupon}`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      })
       .then((res) => {
         alert("Cập nhật thành công!");
         navigate("/admin/promotion"); // quay lại danh sách

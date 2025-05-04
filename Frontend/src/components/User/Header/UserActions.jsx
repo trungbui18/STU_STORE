@@ -44,11 +44,23 @@ export default function UserActions() {
   };
 
   // Xử lý đăng xuất
-  const handleLogout = () => {
-    localStorage.clear();
-    sessionStorage.clear();
-    setIsDropdownOpen(false);
-    navigate("/");
+  const handleLogout = async () => {
+    try {
+      await axios.post(
+        `${API_BASE_URL}/auth/logout`,
+        {},
+        {
+          withCredentials: true,
+        }
+      );
+
+      localStorage.clear();
+      sessionStorage.clear();
+      navigate("/");
+      window.location.reload();
+    } catch (error) {
+      console.error("Lỗi khi logout:", error);
+    }
   };
 
   return (

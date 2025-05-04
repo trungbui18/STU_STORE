@@ -2,16 +2,21 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import API_BASE_URL from "../../../config/apiConfig";
-
+import axiosInstance from "../../../config/axiosInstance";
 export default function OrderDetail() {
   const { idOrder } = useParams();
   const [order, setOrder] = useState(null);
-
+  const token = sessionStorage.getItem("token") || null;
   useEffect(() => {
     const fetchOrderDetail = async () => {
       try {
-        const response = await axios.get(
-          `${API_BASE_URL}/order-detail/getOrderDetail_ByOrderId/${idOrder}`
+        const response = await axiosInstance.get(
+          `/order-detail/getOrderDetail_ByOrderId/${idOrder}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
         setOrder(response.data);
       } catch (error) {
@@ -37,10 +42,15 @@ export default function OrderDetail() {
 
   const updateStatus = async (newStatus) => {
     try {
-      const response = await axios.put(
-        `${API_BASE_URL}/order/update-status/${idOrder}`,
+      const response = await axiosInstance.put(
+        `/order/update-status/${idOrder}`,
         null,
-        { params: { status: newStatus } }
+        {
+          params: { status: newStatus },
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
 
       if (response.data.status === "success") {

@@ -5,7 +5,7 @@ import ReviewOrder from "./ReviewOrder";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import API_BASE_URL from "../../../config/apiConfig";
-
+import axiosInstance from "../../../config/axiosInstance";
 const useCartDetails = (idCart) => {
   const [listCartDetails, setListCartDetails] = useState([]);
   useEffect(() => {
@@ -32,8 +32,8 @@ const apiService = {
   createPayment: async (total) => {
     const token = getToken();
     console.log("token", token);
-    const response = await axios.post(
-      `${API_BASE_URL}/api/payment/create_payment?price=${total}`,
+    const response = await axiosInstance.post(
+      `/api/payment/create_payment?price=${total}`,
       {},
       {
         headers: {
@@ -45,8 +45,6 @@ const apiService = {
   },
 
   createOrder: async (orderRequestDTO) => {
-    const token = getToken();
-    console.log("token", token);
     const response = await axios.post(
       `${API_BASE_URL}/order/create`,
       orderRequestDTO
@@ -111,6 +109,7 @@ const Checkout = () => {
       console.log("OrderRequestDTO:", orderRequestDTO);
       await apiService.createOrder(orderRequestDTO);
       alert("Đặt hàng thành công!");
+      navigate("/");
     } catch (error) {
       console.error("Failed to checkout:", error);
       alert("Có lỗi trong quá trình đặt hàng!");

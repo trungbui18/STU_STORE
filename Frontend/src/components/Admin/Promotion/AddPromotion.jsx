@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
-import API_BASE_URL from "../../../config/apiConfig";
-
+import axiosInstance from "../../../config/axiosInstance";
 const AddPromotion = () => {
   const navigate = useNavigate();
   const idStaff = sessionStorage.getItem("idStaff") || 0;
+  const token = sessionStorage.getItem("token") || null;
   const [formData, setFormData] = useState({
     couponName: "",
     discount_percent: "",
@@ -19,7 +19,7 @@ const AddPromotion = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const now = new Date();
@@ -36,22 +36,14 @@ const AddPromotion = () => {
       return;
     }
 
-    fetch(`${API_BASE_URL}/coupon/create`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    })
-      .then((res) => {
-        if (res.ok) {
-          alert("Tạo mã khuyến mãi thành công!");
-          navigate("/admin/promotion");
-        } else {
-          alert("Tạo mã khuyến mãi thất bại.");
-        }
-      })
-      .catch((err) => console.error("Error:", err));
+    try {
+      const res = await axiosInstance.post("/coupon/create", formData);
+      alert("Tạo mã khuyến mãi thành công!");
+      navigate("/admin/promotion");
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Tạo mã khuyến mãi thất bại.");
+    }
   };
 
   return (

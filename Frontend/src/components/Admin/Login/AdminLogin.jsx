@@ -16,11 +16,9 @@ export default function AdminLogin() {
       password: password,
     };
     try {
-      const response = await axios.post(
-        `${API_BASE_URL}/auth/login`,
-        data,
-        { withCredentials: true } // giống credentials: "include" trong fetch
-      );
+      const response = await axios.post(`${API_BASE_URL}/auth/login`, data, {
+        withCredentials: true,
+      });
 
       const resData = response.data;
       if (resData.role != "STAFF") {

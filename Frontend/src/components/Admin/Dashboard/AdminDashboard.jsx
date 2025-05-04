@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Chart from "react-apexcharts";
 import * as XLSX from "xlsx";
 import API_BASE_URL from "../../../config/apiConfig";
-
+import axiosInstance from "../../../config/axiosInstance";
 const RevenueExport = () => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -15,42 +15,34 @@ const RevenueExport = () => {
   // Gọi API doanh thu theo khoảng ngày
   const fetchRevenueForExport = async (start, end) => {
     try {
-      const res = await fetch(
-        `${API_BASE_URL}/order/revenue?startDate=${start}&endDate=${end}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (!res.ok) throw new Error("Failed to fetch revenue");
-      const data = await res.json();
-      setExportData(data);
-      return data;
+      const res = await axiosInstance.get(`/order/revenue`, {
+        params: {
+          startDate: start,
+          endDate: end,
+        },
+      });
+      setExportData(res.data);
+      return res.data;
     } catch (error) {
       console.error("Lỗi khi gọi API export:", error);
       return [];
     }
   };
 
-  // Gọi API doanh thu theo ngày để vẽ biểu đồ
   const fetchChartRevenue = async (date) => {
     try {
-      const res = await fetch(
-        `${API_BASE_URL}/order/revenue/oneday?date=${date}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (!res.ok) throw new Error("Failed to fetch chart revenue");
-      const data = await res.json();
+      const res = await axiosInstance.get(`/order/revenue/oneday`, {
+        params: { date },
+      });
+
+      const data = res.data;
+
       // Tạo mảng đầy đủ từ 0 đến 23
       const fullHours = Array.from({ length: 24 }, (_, i) => ({
         hour: i,
         revenue: 0,
       }));
+
       // Kết hợp dữ liệu API vào mảng đầy đủ
       data.forEach((item) => {
         const hour = Math.round(item.hour);
@@ -58,6 +50,7 @@ const RevenueExport = () => {
           fullHours[hour] = { hour, revenue: item.revenue };
         }
       });
+
       setChartData(fullHours);
     } catch (error) {
       console.error("Lỗi khi gọi API biểu đồ:", error);

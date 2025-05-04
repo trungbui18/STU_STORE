@@ -2,8 +2,7 @@ import React, { useEffect, useState } from "react";
 import CartItem from "./CartItem";
 import CartSummary from "./CartSummary";
 import axios from "axios";
-import API_BASE_URL from "../../../config/apiConfig";
-
+import axiosInstance from "../../../config/axiosInstance";
 const Cart = () => {
   const [listCartDetails, setListCartDetails] = useState([]);
   const idCart = sessionStorage.getItem("idCart");
@@ -12,8 +11,8 @@ const Cart = () => {
     if (idCart) {
       const fetchCartDetails = async () => {
         try {
-          const response = await axios.get(
-            `${API_BASE_URL}/cart-detail/getAll-ByCartId/${idCart}`
+          const response = await axiosInstance.get(
+            `/cart-detail/getAll-ByCartId/${idCart}`
           );
           setListCartDetails(response.data);
         } catch (error) {
@@ -30,8 +29,8 @@ const Cart = () => {
         quantity: quantity,
         size: size,
       };
-      const response = await axios.put(
-        `${API_BASE_URL}/cart-detail/update/${idCartDetail}`,
+      const response = await axiosInstance.put(
+        `/cart-detail/update/${idCartDetail}`,
         updateDTO
       );
       setListCartDetails((prev) =>
@@ -48,7 +47,7 @@ const Cart = () => {
     const confirm = window.confirm("Bạn có chắc muốn xóa ko ? ");
     if (!confirm) return;
     try {
-      await axios.delete(`${API_BASE_URL}/cart-detail/delete/${idCartDetail}`);
+      await axiosInstance.delete(`/cart-detail/delete/${idCartDetail}`);
       setListCartDetails((prev) =>
         prev.filter((item) => item.idCartDetail !== idCartDetail)
       );

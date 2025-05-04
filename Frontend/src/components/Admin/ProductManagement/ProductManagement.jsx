@@ -5,14 +5,15 @@ import { Link } from "react-router-dom";
 import { Eye, Trash2, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import API_BASE_URL from "../../../config/apiConfig";
+import axiosInstance from "../../../config/axiosInstance";
 export default function ProductManagement() {
   const [listProduct, setListProduct] = useState([]);
   const [selectedImage, setSelectedImage] = useState(null);
   const navigate = useNavigate();
   useEffect(() => {
     const FetchProduct = async () => {
-      await axios
-        .get(`${API_BASE_URL}/product/getAll`)
+      await axiosInstance
+        .get("/product/getAll")
         .then((response) => {
           setListProduct(response.data);
         })
@@ -29,7 +30,7 @@ export default function ProductManagement() {
     );
     if (!confirm) return;
     try {
-      await axios.delete(`${API_BASE_URL}/product/delete/${idProduct}`);
+      await axiosInstance.delete(`/product/delete/${idProduct}`);
       console.log("Xóa thành công sản phẩm có ID:", idProduct);
 
       setListProduct((prevProducts) =>

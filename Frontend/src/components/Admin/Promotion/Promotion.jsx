@@ -3,16 +3,44 @@ import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, Plus, Trash2 } from "lucide-react";
 import API_BASE_URL from "../../../config/apiConfig";
-
+import axiosInstance from "../../../config/axiosInstance";
 const Promotion = () => {
   const [couponList, setCouponList] = useState([]);
   const navigate = useNavigate();
+  const token = sessionStorage.getItem("token") || null;
 
-  const fetchCoupons = () => {
+  const fetchToken = () => {
+    return axios
+      .post(`${API_BASE_URL}/auth/refresh-token`, null, {
+        withCredentials: true,
+      })
+      .then((res) => {
+        const newAccessToken = res.data.accessToken;
+        sessionStorage.setItem("token", newAccessToken);
+      })
+      .catch((err) => {
+        console.error("Lỗi khi refresh token:", err);
+      });
+  };
+
+  const fetchCoupons = (tokenParam = token) => {
     axios
-      .get(`${API_BASE_URL}/coupon/getAll`)
+      .get(`${API_BASE_URL}/coupon/getAll`, {
+        headers: {
+          Authorization: `Bearer ${tokenParam}`,
+        },
+      })
       .then((res) => setCouponList(res.data))
-      .catch((err) => console.error("Lỗi khi load coupon:", err));
+      .catch((err) => {
+        if (err.response && err.response.status === 401) {
+          fetchToken().then(() => {
+            const newToken = sessionStorage.getItem("token");
+            fetchCoupons(newToken);
+          });
+        } else {
+          console.error("Lỗi khi load coupon:", err);
+        }
+      });
   };
 
   useEffect(() => {
@@ -24,7 +52,11 @@ const Promotion = () => {
     if (!confirm) return;
 
     axios
-      .delete(`${API_BASE_URL}/coupon/delete/${id}`)
+      .delete(`${API_BASE_URL}/coupon/delete/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then((res) => {
         fetchCoupons();
       })

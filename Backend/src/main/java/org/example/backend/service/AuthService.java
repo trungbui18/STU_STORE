@@ -48,9 +48,9 @@ public class AuthService {
         return new LoginResponse(accessToken, refreshToken,idUser,role);
     }
 
-    public TokenResponse refreshAccessToken(RefreshTokenRequest refreshToken) {
+    public TokenResponse refreshAccessToken(String refreshToken) {
         try {
-            Map<String, Object> claims = jwtUtil.parseClaims(refreshToken.getRefreshToken());
+            Map<String, Object> claims = jwtUtil.parseClaims(refreshToken);
             String username = (String) claims.get("sub");
             String role = (String) claims.get("role");
             String newAccessToken = jwtUtil.generateToken(username, role);

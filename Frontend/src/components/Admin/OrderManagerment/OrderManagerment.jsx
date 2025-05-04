@@ -3,16 +3,22 @@ import axios from "axios";
 import { Eye } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import API_BASE_URL from "../../../config/apiConfig";
+import axiosInstance from "../../../config/axiosInstance";
 
 const OrderManagerment = () => {
   const [orders, setOrders] = useState([]);
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [selectedStatus, setSelectedStatus] = useState("All");
+  const token = sessionStorage.getItem("token") || null;
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios
-      .get(`${API_BASE_URL}/order/getAll`)
+    axiosInstance
+      .get(`/order/getAll`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then((res) => {
         setOrders(res.data);
         setFilteredOrders(res.data);

@@ -3,8 +3,7 @@ import NewImagesUploader from "./NewImagesUploader";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
-import API_BASE_URL from "../../../../config/apiConfig";
-
+import axiosInstance from "../../../../config/axiosInstance";
 export default function AddProductForm() {
   const navigate = useNavigate();
   const [images, setImages] = useState([]);
@@ -63,8 +62,8 @@ export default function AddProductForm() {
       formData.append("file", imageObj.file);
     });
 
-    axios
-      .post(`${API_BASE_URL}/product/create`, formData, {
+    axiosInstance
+      .post("/product/create", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${token}`,

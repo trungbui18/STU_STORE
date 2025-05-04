@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import OldImages from "./OldImages";
 import NewImagesUploader from "./NewImagesUploader";
-import API_BASE_URL from "../../../../config/apiConfig";
+import axiosInstance from "../../../../config/axiosInstance";
 
 export default function EditProductForm() {
   const navigate = useNavigate();
@@ -22,9 +22,7 @@ export default function EditProductForm() {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await axios.get(
-          `${API_BASE_URL}/product/getProduct/${id}`
-        );
+        const response = await axiosInstance.get(`/product/getProduct/${id}`);
         const data = response.data;
         setProduct(data);
         setSizes(data.sizes || []);
@@ -80,7 +78,7 @@ export default function EditProductForm() {
     formData.append("imagesDeleted", imagesToDelete);
 
     try {
-      await axios.put(`${API_BASE_URL}/product/update/${id}`, formData, {
+      await axiosInstance.put(`/product/update/${id}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${token}`,

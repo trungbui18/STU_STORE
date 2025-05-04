@@ -1,8 +1,31 @@
-import { Menu, Search, Bell, UserCircle, LogOut } from "lucide-react";
+import { Menu, Search, Bell, UserCircle, LogOut, Cookie } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie"; // ✅ đúng thư viện thao tác cookie
+import axios from "axios";
+import API_BASE_URL from "../../../config/apiConfig";
 
 export default function Navbar({ onToggleSidebar }) {
   const [showDropdown, setShowDropdown] = useState(false);
+  const navigate = useNavigate();
+  const handleLogout = async () => {
+    try {
+      await axios.post(
+        `${API_BASE_URL}/auth/logout`,
+        {},
+        {
+          withCredentials: true,
+        }
+      );
+
+      localStorage.clear();
+      sessionStorage.clear();
+      navigate("/");
+      window.location.reload();
+    } catch (error) {
+      console.error("Lỗi khi logout:", error);
+    }
+  };
 
   return (
     <div className="bg-white shadow-md p-4 flex items-center justify-between">
@@ -49,7 +72,10 @@ export default function Navbar({ onToggleSidebar }) {
               <a href="#" className="block p-2 hover:bg-gray-100">
                 Settings
               </a>
-              <button className="flex items-center w-full p-2 text-red-600 hover:bg-gray-100">
+              <button
+                className="flex items-center w-full p-2 text-red-600 hover:bg-gray-100"
+                onClick={handleLogout}
+              >
                 <LogOut className="w-5 h-5 mr-2" /> Logout
               </button>
             </div>

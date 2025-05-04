@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import API_BASE_URL from "../../../config/apiConfig";
-
+import axiosInstance from "../../../config/axiosInstance";
 const CartItem = ({ item, listCartDetails, updateQuantity, removeItem }) => {
   const [tempQuantity, setTempQuantity] = useState(item.quantity);
   const [tempSize, setTempSize] = useState(item.size);
@@ -20,8 +20,8 @@ const CartItem = ({ item, listCartDetails, updateQuantity, removeItem }) => {
     const timer = setTimeout(async () => {
       if (tempQuantity !== item.quantity || tempSize !== item.size) {
         try {
-          const response = await axios.post(
-            `${API_BASE_URL}/cart-detail/check-quantity`,
+          const response = await axiosInstance.post(
+            "/cart-detail/check-quantity",
             {
               idProduct: item.idProduct,
               size: tempSize,
