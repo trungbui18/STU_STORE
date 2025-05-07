@@ -23,7 +23,6 @@ public class OrderDetailController {
     @PostMapping("/create")
     public ResponseEntity<?> createOrderDetail(@RequestBody OrderDetailDTO orderDetailDTO) {
         try {
-            System.out.println("DTO size: " + orderDetailDTO.getSize());
             OrderDetailDTO orderDetail = orderDetailService.createOrderDetail(orderDetailDTO);
             return ResponseEntity.ok(orderDetail);
         } catch (Exception e) {

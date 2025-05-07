@@ -36,6 +36,11 @@ public class ProductService {
         return dssp;
     }
 
+    public List<ProductDTO> getProductRecommendation(List<Integer> ids){
+        List<ProductDTO> dssp= productMapper.toListProductDTO(productRepository. findProductsByIds(ids));
+        return dssp;
+    }
+
     public List<ProductDTO> searchProduct(String keyword){
         return productMapper.toListProductDTO(productRepository.findByNameContainingIgnoreCase(keyword));
     }

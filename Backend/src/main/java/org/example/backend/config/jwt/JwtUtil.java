@@ -35,7 +35,6 @@ public class JwtUtil {
     public String generateToken(String username, String roles) {
         try {
             Instant now = Instant.now();
-            System.out.println("Current time: " + now);
             return Jwts.builder()
                     .issuer(issuer)
                     .subject(username)

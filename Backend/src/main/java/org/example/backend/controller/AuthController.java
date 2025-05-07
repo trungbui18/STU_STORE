@@ -46,7 +46,6 @@ public class AuthController {
     @PostMapping("/refresh-token")
     public ResponseEntity<TokenResponse> refreshToken(@CookieValue("refreshToken") String refreshToken) {
         try {
-            System.out.println("refreshToken");
             return ResponseEntity.ok(authService.refreshAccessToken(refreshToken));
         } catch (Exception e) {
             throw new RuntimeException(e);

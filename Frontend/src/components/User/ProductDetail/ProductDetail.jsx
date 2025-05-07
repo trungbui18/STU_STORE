@@ -1,14 +1,12 @@
 import ProductImages from "./ProductImages ";
 import ProductInfo from "./ProductInfo";
 import { useParams } from "react-router-dom";
-import hinh1 from "../../../assets/hinh1.avif";
-import hinh2 from "../../../assets/hinh2.avif";
-import hinh4 from "../../../assets/hinh3.avif";
-import hinh3 from "../../../assets/hinh4.avif";
+
 import { useEffect } from "react";
 import axios from "axios";
 import { useState } from "react";
 import API_BASE_URL from "../../../config/apiConfig";
+import RecommendProduct from "./RecommendProduct";
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -31,19 +29,26 @@ export default function ProductDetail() {
 
   if (!product) return <p>Loading...</p>;
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row bg-white-100">
-      {!product ? (
-        <p className="text-center">Đang tải...</p>
-      ) : (
-        <>
-          {product?.images?.length > 0 ? (
-            <ProductImages images={product.images} />
-          ) : (
-            <p className="text-center">Không có hình ảnh</p>
-          )}
-          <ProductInfo product={product} />
-        </>
-      )}
+    <div className="min-h-screen flex flex-col bg-white-100">
+      <div className="flex flex-col lg:flex-row border border-black border-b-1">
+        {!product ? (
+          <p className="text-center">Đang tải...</p>
+        ) : (
+          <>
+            {product?.images?.length > 0 ? (
+              <ProductImages images={product.images} />
+            ) : (
+              <p className="text-center">Không có hình ảnh</p>
+            )}
+            <ProductInfo product={product} />
+          </>
+        )}
+      </div>
+
+      {/* Gợi ý nằm dưới cùng */}
+      <div className="mt-8 w-full text-center text-lg font-semibold text-gray-700">
+        <RecommendProduct idProduct={id} />{" "}
+      </div>
     </div>
   );
 }

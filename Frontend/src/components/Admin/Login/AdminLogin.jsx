@@ -25,6 +25,7 @@ export default function AdminLogin() {
         alert("Bạn không có quyền truy cập vào trang này");
         return;
       }
+      sessionStorage.clear();
       sessionStorage.setItem("token", resData.accessToken);
       sessionStorage.setItem("idStaff", resData.idUser);
       alert("Đăng nhập thành công");

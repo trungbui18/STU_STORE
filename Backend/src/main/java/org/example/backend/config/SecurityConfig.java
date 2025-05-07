@@ -46,7 +46,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/auth/**", "/product/search", "/product/getAll","/product/getProduct/**","/assets/**",
-                                 "/cart-detail/**","/cart/**","/order/create","/coupon/exists/{code}").permitAll()
+                                 "/cart-detail/**","/cart/**","/order/create","/coupon/exists/{code}","/api/recommend").permitAll()
                 .requestMatchers("/product/create", "/product/update/**", "/product/delete/**",
                                  "/coupon/create","/coupon/delete/{idCoupon}","/coupon/update/{idCoupon}",
                                  "/coupon/getById/{idCoupon}","/coupon/getAll","/order/getAll","order/revenue/oneday",
